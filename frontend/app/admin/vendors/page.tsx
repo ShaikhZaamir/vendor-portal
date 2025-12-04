@@ -3,53 +3,54 @@ export const dynamic = "force-dynamic";
 import { apiGet } from "@/lib/api";
 import Link from "next/link";
 
+interface VendorStats {
+    id: string;
+    name: string;
+    category: string;
+    average_rating: number | null;
+    review_count: number | null;
+}
+
+
 export default async function AdminVendorsPage() {
     const data = await apiGet("/api/public/vendors-with-stats");
-
     const vendors = data.vendors || [];
 
-    type VendorStats = {
-        id: string;
-        name: string;
-        category: string;
-        city: string;
-        logo_url: string | null;
-        average_rating: number | null;
-        review_count: number | null;
-    };
-
-
     return (
-        <div className="max-w-5xl mx-auto p-6">
-            <h1 className="text-3xl font-bold mb-6">Admin Panel — Vendor Overview</h1>
+        <div className="max-w-5xl mx-auto p-8">
+            <h1 className="text-2xl font-semibold mb-6 text-gray-900">Admin Panel — Vendor Overview</h1>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 gap-4">
-                {vendors.map((vendor: VendorStats) => (
-                    <div
-                        key={vendor.id}
-                        className="border rounded-lg p-4 shadow hover:shadow-md transition"
-                    >
-                        <h2 className="text-xl font-semibold">{vendor.name}</h2>
+            <div className="overflow-x-auto bg-white rounded-xl border border-gray-200 shadow-sm">
+                <table className="min-w-full text-left text-gray-900">
+                    <thead className="border-b bg-gray-50">
+                        <tr>
+                            <th className="px-4 py-3 font-medium">Vendor Name</th>
+                            <th className="px-4 py-3 font-medium">Category</th>
+                            <th className="px-4 py-3 font-medium">Rating</th>
+                            <th className="px-4 py-3 font-medium">Reviews</th>
+                            <th className="px-4 py-3 font-medium">Action</th>
+                        </tr>
+                    </thead>
 
-                        <p className="text-gray-600">{vendor.category}</p>
-                        <p className="text-gray-600">{vendor.city}</p>
-
-                        <p className="mt-2 font-medium">
-                            ⭐ Average Rating: {vendor.average_rating ?? 0}
-                        </p>
-
-                        <p className="text-gray-700">
-                            📝 Reviews: {vendor.review_count ?? 0}
-                        </p>
-
-                        <Link
-                            href={`/vendor/${vendor.id}`}
-                            className="inline-block mt-4 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition"
-                        >
-                            View Vendor
-                        </Link>
-                    </div>
-                ))}
+                    <tbody>
+                        {vendors.map((vendor: VendorStats) => (
+                            <tr key={vendor.id} className="border-b hover:bg-gray-50 transition">
+                                <td className="px-4 py-3">{vendor.name}</td>
+                                <td className="px-4 py-3">{vendor.category}</td>
+                                <td className="px-4 py-3">{vendor.average_rating ?? 0}</td>
+                                <td className="px-4 py-3">{vendor.review_count ?? 0}</td>
+                                <td className="px-4 py-3">
+                                    <Link
+                                        href={`/vendor/${vendor.id}`}
+                                        className="text-blue-600 hover:underline"
+                                    >
+                                        View Vendor
+                                    </Link>
+                                </td>
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
             </div>
         </div>
     );

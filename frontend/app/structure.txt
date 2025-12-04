@@ -1,0 +1,57 @@
+Folder PATH listing for volume OS
+Volume serial number is 5E76-E313
+C:.
+|   favicon.ico
+|   globals.css
+|   layout.tsx
+|   page.tsx
+|   structure.txt
+|   
++---admin
+|   |   layout.tsx
+|   |   
+|   \---vendors
+|           page.tsx
+|           
++---api
+|   \---upload
+|           route.ts
+|           
++---components
+|       LogoUploader.tsx
+|       
++---dashboard
+|   |   layout.tsx
+|   |   page.tsx
+|   |   
+|   +---products
+|   |   |   page.tsx
+|   |   |   
+|   |   +---add
+|   |   |       page.tsx
+|   |   |       
+|   |   \---[id]
+|   |       \---edit
+|   |               page.tsx
+|   |               
+|   \---profile
+|           page.tsx
+|           
++---feedback
+|   \---[id]
+|           page.tsx
+|           StarRating.tsx
+|           
++---login
+|       page.tsx
+|       
++---register
+|       page.tsx
+|       
++---vendor
+|   \---[id]
+|           page.tsx
+|           
+\---vendors
+        page.tsx
+        

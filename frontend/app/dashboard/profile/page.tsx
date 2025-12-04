@@ -140,14 +140,7 @@ export default function EditProfilePage() {
 
                 <div>
                     <label className="block mb-1 font-medium">Logo URL (optional)</label>
-                    <input
-                        type="text"
-                        value={vendor.logo_url || ""}
-                        onChange={(e) =>
-                            setVendor({ ...vendor, logo_url: e.target.value })
-                        }
-                        className="w-full border p-2 rounded"
-                    />
+                    IMG
                 </div>
 
                 <button

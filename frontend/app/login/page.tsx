@@ -56,6 +56,11 @@ export default function LoginPage() {
                 >
                     Login
                 </button>
+
+                <a href="/register">
+                    Register
+                </a>
+
             </form>
         </div>
     );

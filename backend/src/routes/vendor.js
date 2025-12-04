@@ -220,4 +220,68 @@ router.get("/products/:id", async (req, res) => {
   }
 });
 
+// POST /api/vendor/upload-logo
+router.post("/upload-logo", async (req, res) => {
+  try {
+    const vendorId = req.user.id;
+    const { logo_url } = req.body;
+
+    if (!logo_url) {
+      return res.status(400).json({ error: "logo_url is required." });
+    }
+
+    await pool.query(
+      `UPDATE vendors
+       SET logo_url = $1,
+           updated_at = NOW()
+       WHERE id = $2`,
+      [logo_url, vendorId]
+    );
+
+    return res.json({ message: "Vendor logo updated successfully" });
+  } catch (error) {
+    console.error("Vendor Logo Update Error:", error);
+    return res.status(500).json({ error: "Failed to update vendor logo" });
+  }
+});
+
+// POST /api/vendor/products/update-image
+router.post("/products/update-image", async (req, res) => {
+  try {
+    const vendorId = req.user.id;
+    const { product_id, image_url } = req.body;
+
+    if (!product_id || !image_url) {
+      return res
+        .status(400)
+        .json({ error: "product_id and image_url are required." });
+    }
+
+    // Check ownership
+    const check = await pool.query(
+      "SELECT id FROM products WHERE id = $1 AND vendor_id = $2",
+      [product_id, vendorId]
+    );
+
+    if (check.rows.length === 0) {
+      return res
+        .status(403)
+        .json({ error: "Not authorized to update this product image" });
+    }
+
+    await pool.query(
+      `UPDATE products
+       SET image_url = $1,
+           updated_at = NOW()
+       WHERE id = $2`,
+      [image_url, product_id]
+    );
+
+    return res.json({ message: "Product image updated successfully" });
+  } catch (error) {
+    console.error("Product Image Update Error:", error);
+    return res.status(500).json({ error: "Failed to update product image" });
+  }
+});
+
 export default router;

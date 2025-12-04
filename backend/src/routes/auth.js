@@ -1,15 +1,20 @@
 import express from "express";
+import multer from "multer";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import { pool } from "../db.js";
+import { v2 as cloudinary } from "cloudinary";
 
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
+});
+
+const upload = multer();
 const router = express.Router();
 
-/**
- * -----------------------------------------------
- * REGISTER VENDOR
- * -----------------------------------------------
- */
+// REGISTER VENDOR
 router.post("/register", async (req, res) => {
   try {
     const {
@@ -21,9 +26,24 @@ router.post("/register", async (req, res) => {
       city,
       description,
       password,
+      logo_url,
     } = req.body;
 
-    // Validate fields
+    // Upload logo to Cloudinary
+    if (req.file) {
+      const uploadResult = await new Promise((resolve, reject) => {
+        cloudinary.uploader
+          .upload_stream({ folder: "vendor-logos" }, (err, result) => {
+            if (err) reject(err);
+            else resolve(result);
+          })
+          .end(req.file.buffer);
+      });
+
+      logo_url = uploadResult.secure_url;
+    }
+
+    // VALIDATION
     if (
       !name ||
       !owner_name ||
@@ -38,26 +58,24 @@ router.post("/register", async (req, res) => {
         .json({ error: "All required fields must be filled." });
     }
 
-    // Check if email exists
-    const existingVendor = await pool.query(
-      "SELECT email FROM vendors WHERE email = $1",
-      [email]
-    );
+    // CHECK IF EMAIL EXISTS
+    const exists = await pool.query("SELECT id FROM vendors WHERE email = $1", [
+      email,
+    ]);
 
-    if (existingVendor.rows.length > 0) {
+    if (exists.rows.length > 0) {
       return res.status(400).json({ error: "Email already registered." });
     }
 
-    // Hash password
-    const salt = await bcrypt.genSalt(10);
-    const passwordHash = await bcrypt.hash(password, salt);
+    // HASH PASSWORD
+    const hash = await bcrypt.hash(password, 10);
 
-    // Insert vendor
+    // INSERT VENDOR
     const result = await pool.query(
-      `INSERT INTO vendors (
-        name, owner_name, email, contact, category, city, description, password_hash
-      ) VALUES ($1,$2,$3,$4,$5,$6,$7,$8)
-      RETURNING id, name, email, category, city`,
+      `INSERT INTO vendors
+      (name, owner_name, email, contact, category, city, description, logo_url, password_hash)
+      VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9)
+      RETURNING id, name, email, category, city, logo_url`,
       [
         name,
         owner_name,
@@ -66,25 +84,22 @@ router.post("/register", async (req, res) => {
         category,
         city,
         description || null,
-        passwordHash,
+        logo_url,
+        hash,
       ]
     );
 
-    res.json({
+    return res.json({
       message: "Vendor registered successfully.",
       vendor: result.rows[0],
     });
   } catch (err) {
-    console.error("Register Error:", err);
-    res.status(500).json({ error: "Server error during registration." });
+    console.error("REGISTER ERROR:", err);
+    return res.status(500).json({ error: "Server error during registration" });
   }
 });
 
-/**
- * -----------------------------------------------
- * LOGIN VENDOR
- * -----------------------------------------------
- */
+// LOGIN VENDOR
 router.post("/login", async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -96,7 +111,7 @@ router.post("/login", async (req, res) => {
         .json({ error: "Email and password are required." });
     }
 
-    // Check email
+    // Look up vendor
     const vendorResult = await pool.query(
       "SELECT * FROM vendors WHERE email = $1",
       [email]
@@ -108,21 +123,21 @@ router.post("/login", async (req, res) => {
 
     const vendor = vendorResult.rows[0];
 
-    // Compare passwords
+    // Compare password hash
     const isMatch = await bcrypt.compare(password, vendor.password_hash);
 
     if (!isMatch) {
       return res.status(400).json({ error: "Invalid email or password." });
     }
 
-    // Create token
+    // Create JWT
     const token = jwt.sign(
       { id: vendor.id, email: vendor.email },
       process.env.JWT_SECRET,
       { expiresIn: "7d" }
     );
 
-    // Clean vendor data
+    // Clean vendor object (remove hash)
     const vendorData = {
       id: vendor.id,
       name: vendor.name,
@@ -131,16 +146,17 @@ router.post("/login", async (req, res) => {
       category: vendor.category,
       city: vendor.city,
       average_rating: vendor.average_rating,
+      logo_url: vendor.logo_url,
     };
 
-    res.json({
+    return res.json({
       message: "Login successful",
       token,
       vendor: vendorData,
     });
   } catch (err) {
-    console.error("Login Error:", err);
-    res.status(500).json({ error: "Server error during login." });
+    console.error("LOGIN ERROR:", err);
+    return res.status(500).json({ error: "Server error during login" });
   }
 });
 

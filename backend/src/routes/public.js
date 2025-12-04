@@ -3,16 +3,11 @@ import { pool } from "../db.js";
 
 const router = express.Router();
 
-/**
- * GET FULL PUBLIC VENDOR PROFILE
- * Includes vendor info + all products
- * Public route (no token required)
- */
+// GET FULL PUBLIC VENDOR PROFILE
 router.get("/vendor/:id", async (req, res) => {
   try {
     const vendorId = req.params.id;
 
-    // Get vendor details
     const vendorResult = await pool.query(
       `SELECT id, name, owner_name, email, contact, category, city, description, logo_url, average_rating
        FROM vendors WHERE id = $1`,
@@ -25,7 +20,6 @@ router.get("/vendor/:id", async (req, res) => {
 
     const vendor = vendorResult.rows[0];
 
-    // Get vendor products
     const productsResult = await pool.query(
       `SELECT id, name, description, price, image_url
        FROM products WHERE vendor_id = $1
@@ -42,15 +36,12 @@ router.get("/vendor/:id", async (req, res) => {
   }
 });
 
-/**
- * PUBLIC VENDOR LISTING WITH SEARCH + CATEGORY FILTER + SORT
- * GET /api/public/vendors?search=&category=&sort=
- */
+// PUBLIC VENDOR LISTING
 router.get("/vendors", async (req, res) => {
   try {
     const search = req.query.search || "";
     const category = req.query.category || "";
-    const sort = req.query.sort || ""; // rating_desc, rating_asc
+    const sort = req.query.sort || "";
 
     let query = `
       SELECT id, name, category, city, logo_url, average_rating
@@ -60,13 +51,11 @@ router.get("/vendors", async (req, res) => {
     let params = [];
     let conditions = [];
 
-    // Search condition
     if (search) {
       params.push(`%${search}%`);
       conditions.push(`name ILIKE $${params.length}`);
     }
 
-    // Category filter
     if (category) {
       params.push(category);
       conditions.push(`category = $${params.length}`);
@@ -76,23 +65,18 @@ router.get("/vendors", async (req, res) => {
       query += ` WHERE ` + conditions.join(" AND ");
     }
 
-    // Sorting logic
-    if (sort === "rating_desc") {
-      query += ` ORDER BY average_rating DESC`;
-    } else if (sort === "rating_asc") {
-      query += ` ORDER BY average_rating ASC`;
-    } else {
-      query += ` ORDER BY created_at DESC`; // default: newest vendors first
-    }
+    if (sort === "rating_desc") query += " ORDER BY average_rating DESC";
+    else if (sort === "rating_asc") query += " ORDER BY average_rating ASC";
+    else query += " ORDER BY created_at DESC";
 
     const result = await pool.query(query, params);
-
     return res.json({ vendors: result.rows });
   } catch (err) {
     console.error("Vendor Listing Error:", err);
     return res.status(500).json({ error: "Failed to fetch vendor listing." });
   }
 });
+
 
 /**
  * ADD REVIEW (Public)
