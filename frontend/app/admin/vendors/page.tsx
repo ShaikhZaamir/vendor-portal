@@ -1,7 +1,7 @@
+export const dynamic = "force-dynamic";
+
 import { apiGet } from "@/lib/api";
 import Link from "next/link";
-
-export const dynamic = "force-dynamic";
 
 export default async function AdminVendorsPage() {
     const data = await apiGet("/api/public/vendors-with-stats");

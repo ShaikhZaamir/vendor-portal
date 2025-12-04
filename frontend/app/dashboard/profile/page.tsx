@@ -1,5 +1,7 @@
 "use client";
 
+export const dynamic = "force-dynamic";
+
 import { useEffect, useState } from "react";
 import { apiGet, apiPut } from "@/lib/api";
 import { getToken } from "@/lib/auth";

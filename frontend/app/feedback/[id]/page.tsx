@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 import { apiPost } from "@/lib/api";
 import { redirect } from "next/navigation";
 

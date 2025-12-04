@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 import { apiGet } from "@/lib/api";
 import Link from "next/link";
 import { Star } from "lucide-react";
