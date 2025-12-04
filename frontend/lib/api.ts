@@ -1,4 +1,4 @@
-const BASE_URL = "http://localhost:5000";
+export const BASE_URL = process.env.NEXT_PUBLIC_API_URL!;
 
 // Helper for GET requests
 export async function apiGet(path: string, token?: string) {
