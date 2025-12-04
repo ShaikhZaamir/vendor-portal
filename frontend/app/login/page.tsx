@@ -1,0 +1,62 @@
+"use client";
+
+import { useState } from "react";
+import { apiPost } from "@/lib/api";
+import { saveToken } from "@/lib/auth";
+import { useRouter } from "next/navigation";
+
+export default function LoginPage() {
+    const router = useRouter();
+
+    const [email, setEmail] = useState("");
+    const [password, setPassword] = useState("");
+
+    async function handleLogin(e: React.FormEvent) {
+        e.preventDefault();
+
+        const res = await apiPost("/api/auth/login", {
+            email,
+            password,
+        });
+
+        if (res.token) {
+            saveToken(res.token);
+            router.push("/dashboard");
+        } else {
+            alert(res.error || "Login failed");
+        }
+    }
+
+    return (
+        <div className="max-w-md mx-auto p-6">
+            <h1 className="text-2xl font-bold mb-4">Vendor Login</h1>
+
+            <form onSubmit={handleLogin} className="space-y-4">
+                <input
+                    type="email"
+                    placeholder="Email"
+                    className="w-full border p-2 rounded"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    required
+                />
+
+                <input
+                    type="password"
+                    placeholder="Password"
+                    className="w-full border p-2 rounded"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    required
+                />
+
+                <button
+                    type="submit"
+                    className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700 transition"
+                >
+                    Login
+                </button>
+            </form>
+        </div>
+    );
+}
