@@ -16,7 +16,7 @@ export default async function AdminVendorsPage() {
     const vendors = data.vendors || [];
 
     return (
-        <div className="max-w-5xl mx-auto p-3">
+        <div className="mx-10 p-3">
             {/* PAGE HEADER */}
             <h1 className="text-3xl font-semibold text-gray-900 mb-8">
                 Vendor Overview

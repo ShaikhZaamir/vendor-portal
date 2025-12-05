@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import { apiGet, apiPut } from "@/lib/api";
 import { getToken } from "@/lib/auth";
 import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 
 import ImageUploader from "@/components/ImageUploader";
 import Image from "next/image";
@@ -13,13 +14,12 @@ import Image from "next/image";
 import FormField from "@/components/ui/FormField";
 import Input from "@/components/ui/Input";
 import Button from "@/components/ui/Button";
+import BackButton from "@/components/ui/BackButton";
 
 type Product = {
     name: string;
     description: string | null;
-    min_price?: number | null;
-    max_price?: number | null;
-    price?: number | null;
+    price: number | null;
     image_url: string | null;
 };
 
@@ -28,7 +28,6 @@ export default function EditProductPage(props: { params: Promise<{ id: string }>
 
     const [product, setProduct] = useState<Product | null>(null);
     const [loading, setLoading] = useState(true);
-    const [showSuccess, setShowSuccess] = useState(false);
     const [productId, setProductId] = useState<string | null>(null);
 
     useEffect(() => {
@@ -48,8 +47,7 @@ export default function EditProductPage(props: { params: Promise<{ id: string }>
                 setProduct({
                     name: data.product.name,
                     description: data.product.description,
-                    min_price: data.product.min_price ?? data.product.price ?? null,
-                    max_price: data.product.max_price ?? null,
+                    price: data.product.price ?? null,
                     image_url: data.product.image_url,
                 });
             }
@@ -61,7 +59,13 @@ export default function EditProductPage(props: { params: Promise<{ id: string }>
     if (loading) return <div className="p-6">Loading product...</div>;
     if (!product) return <div className="p-6">Product not found.</div>;
 
-    const _product = product; // guaranteed non-null
+    const _product = product;
+
+    const isFormValid =
+        _product.name.trim() !== "" &&
+        _product.price !== null &&
+        Number(_product.price) > 0 &&
+        _product.image_url?.trim() !== "";
 
     async function handleSubmit(e: React.FormEvent) {
         e.preventDefault();
@@ -69,12 +73,15 @@ export default function EditProductPage(props: { params: Promise<{ id: string }>
         const token = getToken();
         if (!token || !productId) return;
 
-        // Price validation
-        const min = _product.min_price ? Number(_product.min_price) : null;
-        const max = _product.max_price ? Number(_product.max_price) : null;
+        if (!_product.price || Number(_product.price) <= 0) {
+            toast.error("Invalid Price", {
+                description: "Price must be a positive number.",
+            });
+            return;
+        }
 
-        if (min && max && max < min) {
-            alert("Max price must be greater than Min price.");
+        if (!_product.image_url) {
+            toast.error("Please upload a product image.");
             return;
         }
 
@@ -83,18 +90,23 @@ export default function EditProductPage(props: { params: Promise<{ id: string }>
             {
                 name: _product.name,
                 description: _product.description,
-                min_price: min,
-                max_price: max,
-                image_url: _product.image_url || null,
+                price: Number(_product.price),
+                image_url: _product.image_url,
             },
             token
         );
 
-        setShowSuccess(true);
+        toast.success("Product updated successfully!", {
+            description: "Your changes have been saved.",
+        });
+
+        router.push("/dashboard/products");
     }
 
     return (
-        <div className="mx-auto p-6 relative">
+        <div className="mx-auto relative">
+            <BackButton className="max-w-24 mb-3" />
+
             <h1 className="text-3xl font-semibold mb-6 text-gray-900">Edit Product</h1>
 
             <div className="bg-white p-6 rounded-xl border border-gray-100 shadow-md">
@@ -103,35 +115,27 @@ export default function EditProductPage(props: { params: Promise<{ id: string }>
                     {/* Two Column Layout */}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
 
-                        {/* LEFT COLUMN */}
+                        {/* LEFT SIDE */}
                         <div className="space-y-4">
                             <FormField label="Product Name" required>
                                 <Input
                                     value={_product.name}
-                                    onChange={(e) => setProduct({ ...product, name: e.target.value })}
-                                />
-                            </FormField>
-
-                            <FormField label="Min Price">
-                                <Input
-                                    type="number"
-                                    value={_product.min_price ?? ""}
                                     onChange={(e) =>
-                                        setProduct({ ...product, min_price: Number(e.target.value) })
+                                        setProduct({ ...product, name: e.target.value })
                                     }
                                 />
                             </FormField>
 
-                            <FormField label="Max Price">
+                            <FormField label="Price (₹)" required>
                                 <Input
                                     type="number"
-                                    value={_product.max_price ?? ""}
+                                    value={_product.price ?? ""}
                                     onChange={(e) =>
-                                        setProduct({ ...product, max_price: Number(e.target.value) })
+                                        setProduct({ ...product, price: Number(e.target.value) })
                                     }
                                 />
                             </FormField>
-                            
+
                             <FormField label="Short Description">
                                 <textarea
                                     rows={4}
@@ -140,23 +144,23 @@ export default function EditProductPage(props: { params: Promise<{ id: string }>
                                         setProduct({ ...product, description: e.target.value })
                                     }
                                     className="
-                    w-full bg-white border border-gray-300 rounded-md px-4 py-3
-                    text-gray-800 outline-none focus:border-blue-600
-                    focus:ring-2 focus:ring-blue-200
-                  "
+                                        w-full bg-white border border-gray-300 rounded-md px-4 py-3
+                                        text-gray-800 outline-none focus:border-blue-600
+                                        focus:ring-2 focus:ring-blue-200
+                                    "
                                 />
                             </FormField>
                         </div>
 
-                        {/* RIGHT COLUMN */}
+                        {/* RIGHT SIDE */}
                         <div className="space-y-4">
-
-
-                            <FormField label="Product Image">
+                            <FormField label="Product Image (required)">
                                 <ImageUploader
                                     folder="product-images"
-                                    label="Upload Product Image"
-                                    onUpload={(url) => setProduct({ ...product, image_url: url })}
+                                    label=""
+                                    onUpload={(url) =>
+                                        setProduct({ ...product, image_url: url })
+                                    }
                                 />
 
                                 {product.image_url && (
@@ -169,35 +173,24 @@ export default function EditProductPage(props: { params: Promise<{ id: string }>
                                     />
                                 )}
                             </FormField>
-
                         </div>
                     </div>
 
-                    {/* Submit Button */}
+                    {/* SUBMIT BUTTON */}
                     <div className="flex justify-center pt-2">
                         <div className="w-48">
-                            <Button type="submit">Save Changes</Button>
+                            <Button
+                                type="submit"
+                                disabled={!isFormValid}
+                                className={!isFormValid ? "opacity-50 cursor-not-allowed" : ""}
+                            >
+                                Save Changes
+                            </Button>
                         </div>
                     </div>
 
                 </form>
             </div>
-
-            {/* SUCCESS POPUP */}
-            {showSuccess && (
-                <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
-                    <div className="bg-white p-6 rounded-xl shadow-xl w-full max-w-sm text-center">
-                        <h2 className="text-xl font-semibold mb-2">Product Updated</h2>
-                        <p className="text-gray-600 mb-6">
-                            Your product details have been updated successfully.
-                        </p>
-
-                        <Button onClick={() => router.push("/dashboard/products")}>
-                            Go Back to Products
-                        </Button>
-                    </div>
-                </div>
-            )}
         </div>
     );
 }

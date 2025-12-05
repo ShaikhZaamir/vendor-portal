@@ -8,6 +8,7 @@ import ImageUploader from "@/components/ImageUploader";
 import Input from "@/components/ui/Input";
 import Button from "@/components/ui/Button";
 import FormField from "@/components/ui/FormField";
+import { toast } from "sonner";
 
 type RegisterForm = {
     name: string;
@@ -48,7 +49,6 @@ export default function RegisterPage() {
 
     const [confirmPassword, setConfirmPassword] = useState("");
     const [logo, setLogo] = useState<string>("");
-    const [showSuccess, setShowSuccess] = useState(false);
     const [errors, setErrors] = useState<RegisterErrors>({});
 
     function updateField(field: keyof RegisterForm, value: string) {
@@ -70,9 +70,7 @@ export default function RegisterPage() {
             newErrors.contact = "Enter a valid 10-digit number.";
 
         if (!form.category) newErrors.category = "Category is required.";
-
         if (!form.city) newErrors.city = "City is required.";
-
         if (!form.description)
             newErrors.description = "Description is required.";
 
@@ -105,11 +103,15 @@ export default function RegisterPage() {
         const data = await res.json();
 
         if (data.error) {
-            alert(data.error);
+            toast.error(data.error);
             return;
         }
 
-        setShowSuccess(true);
+        toast.success("Registration successful!", {
+            description: "Your vendor account has been created.",
+        });
+
+        router.push("/login");
     }
 
     return (
@@ -120,11 +122,8 @@ export default function RegisterPage() {
                 </h1>
 
                 <form onSubmit={handleSubmit} noValidate className="space-y-6">
-
-                    {/* Two-column grid */}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-15">
-
-                        {/* LEFT COLUMN */}
+                        {/* LEFT */}
                         <div className="space-y-4">
                             <FormField label="Vendor Name" required error={errors.name}>
                                 <Input
@@ -159,11 +158,7 @@ export default function RegisterPage() {
                                 />
                             </FormField>
 
-                            <FormField
-                                label="Business Category"
-                                required
-                                error={errors.category}
-                            >
+                            <FormField label="Business Category" required error={errors.category}>
                                 <select
                                     className="w-full bg-white border border-gray-300 rounded-md px-4 py-3 text-gray-800 outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-200"
                                     value={form.category}
@@ -191,9 +186,8 @@ export default function RegisterPage() {
                             </FormField>
                         </div>
 
-                        {/* RIGHT COLUMN */}
+                        {/* RIGHT */}
                         <div className="space-y-4">
-
                             <FormField label="Upload Company Logo">
                                 <ImageUploader
                                     folder="vendor-logos"
@@ -246,31 +240,21 @@ export default function RegisterPage() {
                         </div>
                     </div>
 
-                    {/* Centered Register button */}
                     <div className="flex justify-center pt-4">
                         <div className="w-48">
                             <Button type="submit">Register</Button>
                         </div>
                     </div>
+                    <div className="text-center">
+                        <a
+                            href="/login"
+                            className="text-blue-600 hover:text-blue-700 underline text-sm"
+                        >
+                            Already have an account? Login
+                        </a>
+                    </div>
                 </form>
             </div>
-
-            {/* SUCCESS MODAL */}
-            {showSuccess && (
-                <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
-                    <div className="bg-white p-6 rounded-xl shadow-xl w-full max-w-sm text-center">
-                        <h2 className="text-xl font-semibold mb-2 text-gray-900">
-                            Registration Successful
-                        </h2>
-
-                        <p className="text-gray-600 mb-6">
-                            Your vendor account has been created successfully.
-                        </p>
-
-                        <Button onClick={() => router.push("/login")}>Go to Login</Button>
-                    </div>
-                </div>
-            )}
         </div>
     );
 }

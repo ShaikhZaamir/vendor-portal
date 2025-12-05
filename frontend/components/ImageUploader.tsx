@@ -60,7 +60,7 @@ export default function ImageUploader({
                 <span className="text-blue-600 font-medium text-sm">
                     Click to upload
                 </span>
-                <span className="text-xs text-gray-500 mt-1">JPG, PNG — up to 2MB</span>
+                <span className="text-xs text-gray-500 mt-1">JPG, PNG - up to 2MB</span>
 
                 {loading && (
                     <span className="text-xs text-gray-500 mt-2 animate-pulse">

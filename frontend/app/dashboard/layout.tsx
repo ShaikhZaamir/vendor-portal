@@ -4,6 +4,8 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { LogOut, User, LayoutDashboard, Package } from "lucide-react";
 import Button from "@/components/ui/Button";
+import ConfirmDialog from "@/components/ui/ConfirmDialog";
+import { useState } from "react";
 
 function cn(...classes: string[]) {
     return classes.filter(Boolean).join(" ");
@@ -22,6 +24,8 @@ export default function VendorDashboardLayout({
 }) {
     const pathname = usePathname();
     const router = useRouter();
+
+    const [confirmOpen, setConfirmOpen] = useState(false);
 
     const logout = () => {
         localStorage.removeItem("vendor_token");
@@ -60,21 +64,31 @@ export default function VendorDashboardLayout({
                     </nav>
                 </div>
 
+                {/* Logout button with dialog */}
                 <Button
                     variant="danger"
-                    onClick={logout}
+                    onClick={() => setConfirmOpen(true)}
                     className="flex items-center justify-center gap-2"
                 >
                     <LogOut size={16} />
                     Logout
                 </Button>
-
             </aside>
 
             {/* Content */}
             <main className="flex-1 p-10 overflow-y-auto">
                 {children}
             </main>
+
+            <ConfirmDialog
+                open={confirmOpen}
+                title="Logout?"
+                message="Are you sure you want to log out of your vendor account?"
+                confirmText="Logout"
+                cancelText="Cancel"
+                onConfirm={logout}
+                onCancel={() => setConfirmOpen(false)}
+            />
         </div>
     );
 }

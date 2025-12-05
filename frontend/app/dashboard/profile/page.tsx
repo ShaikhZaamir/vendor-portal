@@ -12,6 +12,7 @@ import Input from "@/components/ui/Input";
 import Button from "@/components/ui/Button";
 import ImageUploader from "@/components/ImageUploader";
 import Image from "next/image";
+import { toast } from "sonner"; // ⭐ NEW
 
 type Vendor = {
     name: string;
@@ -70,7 +71,11 @@ export default function EditProfilePage() {
             token ?? undefined
         );
 
-        alert("Profile updated successfully!");
+        // ⭐ Replace ALERT with TOAST
+        toast.success("Profile updated successfully!", {
+            description: "Your account details have been saved.",
+        });
+
         router.push("/dashboard");
     }
 
@@ -116,12 +121,11 @@ export default function EditProfilePage() {
                                 />
                             </FormField>
 
-                            <FormField label="Category">
+                            <FormField label="Category" >
                                 <Input
                                     value={vendor.category}
-                                    onChange={(e) =>
-                                        setVendor({ ...vendor, category: e.target.value })
-                                    }
+                                    readOnly
+                                    className="bg-gray-100 cursor-not-allowed"
                                 />
                             </FormField>
 
@@ -147,10 +151,10 @@ export default function EditProfilePage() {
                                     }
                                     rows={4}
                                     className="
-              w-full bg-white border border-gray-300 rounded-md px-4 py-3
-              text-gray-800 outline-none focus:border-blue-600
-              focus:ring-2 focus:ring-blue-200
-            "
+                                        w-full bg-white border border-gray-300 rounded-md px-4 py-3
+                                        text-gray-800 outline-none focus:border-blue-600
+                                        focus:ring-2 focus:ring-blue-200
+                                    "
                                 />
                             </FormField>
 

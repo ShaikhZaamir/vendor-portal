@@ -8,14 +8,13 @@ import { getToken } from "@/lib/auth";
 import Link from "next/link";
 import Image from "next/image";
 import Button from "@/components/ui/Button";
+import ConfirmDialog from "@/components/ui/ConfirmDialog";
 
 type Product = {
     id: string;
     name: string;
     description: string | null;
     price?: number | null;
-    min_price?: number | null;
-    max_price?: number | null;
     image_url?: string | null;
 };
 
@@ -23,6 +22,9 @@ export default function ProductListPage() {
     const [products, setProducts] = useState<Product[]>([]);
     const [loading, setLoading] = useState(true);
     const [authFail, setAuthFail] = useState(false);
+
+    const [confirmOpen, setConfirmOpen] = useState(false);
+    const [deleteId, setDeleteId] = useState<string | null>(null);
 
     useEffect(() => {
         const load = async () => {
@@ -52,6 +54,20 @@ export default function ProductListPage() {
 
     if (loading) {
         return <div className="p-6">Loading your products...</div>;
+    }
+
+    async function handleConfirmDelete() {
+        if (!deleteId) return;
+        const token = getToken();
+        if (!token) return;
+
+        await apiDelete(`/api/vendor/products/${deleteId}`, token);
+
+        // Remove from local UI
+        setProducts((prev) => prev.filter((p) => p.id !== deleteId));
+
+        // Close dialog
+        setConfirmOpen(false);
     }
 
     return (
@@ -103,18 +119,16 @@ export default function ProductListPage() {
                             </p>
                         )}
 
-                        {/* Price */}
+                        {/* PRICE */}
                         <div className="mt-3 font-medium text-gray-900">
-                            {p.min_price || p.max_price ? (
-                                <>₹ {p.min_price ?? p.price} – {p.max_price ?? p.price}</>
-                            ) : p.price ? (
+                            {p.price ? (
                                 <>₹ {p.price}</>
                             ) : (
                                 <span className="text-gray-500 text-sm">No price specified</span>
                             )}
                         </div>
 
-                        {/* Actions */}
+                        {/* ACTION BUTTONS */}
                         <div className="flex gap-3 mt-5">
                             <Link href={`/dashboard/products/${p.id}/edit`} className="flex-1">
                                 <Button variant="secondary" className="py-2">
@@ -125,14 +139,9 @@ export default function ProductListPage() {
                             <Button
                                 variant="danger"
                                 className="flex-1 py-2"
-                                onClick={async () => {
-                                    const token = getToken();
-                                    if (!token) return;
-
-                                    if (confirm("Delete this product?")) {
-                                        await apiDelete(`/api/vendor/products/${p.id}`, token ?? undefined);
-                                        setProducts((prev) => prev.filter((x) => x.id !== p.id));
-                                    }
+                                onClick={() => {
+                                    setDeleteId(p.id);
+                                    setConfirmOpen(true); 
                                 }}
                             >
                                 Delete
@@ -141,6 +150,17 @@ export default function ProductListPage() {
                     </div>
                 ))}
             </div>
+
+            <ConfirmDialog
+                open={confirmOpen}
+                title="Delete Product?"
+                message="This product will be permanently removed."
+                confirmText="Delete"
+                cancelText="Cancel"
+                onConfirm={handleConfirmDelete}
+                onCancel={() => setConfirmOpen(false)}
+            />
+
         </div>
     );
 }

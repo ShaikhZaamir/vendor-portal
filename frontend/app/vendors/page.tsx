@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import { apiGet } from "@/lib/api";
 import Link from "next/link";
 import Image from "next/image";
+import Button from "@/components/ui/Button";
 import { Star } from "lucide-react";
 
 type Vendor = {
@@ -62,7 +63,18 @@ export default function VendorsPage() {
     }, [search, category, sort, vendors]);
 
     return (
-        <div className="max-w-6xl mx-auto p-6">
+        <div className="mx-auto p-6">
+
+            {/* TOP ACTION BAR */}
+            <div className="flex justify-end gap-4 mb-6">
+                <Link href="/login" className="w-36">
+                    <Button variant="secondary">Vendor Login</Button>
+                </Link>
+
+                <Link href="/admin/vendors" className="w-36">
+                    <Button variant="primary">Admin Panel</Button>
+                </Link>
+            </div>
 
             {/* TITLE */}
             <h1 className="text-3xl font-semibold mb-6 text-gray-900">Vendors</h1>
@@ -121,7 +133,7 @@ export default function VendorsPage() {
             </div>
 
             {/* VENDOR GRID */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+            <div className="grid grid-cols- sm:grid-cols-3 md:grid-cols-4 gap-6">
                 {filtered.map((vendor) => (
                     <div
                         key={vendor.id}
