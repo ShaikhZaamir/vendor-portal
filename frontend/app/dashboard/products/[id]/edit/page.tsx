@@ -158,7 +158,13 @@ export default function EditProductPage(props: { params: Promise<{ id: string }>
                         />
 
                         {product.image_url && (
-                            <Image src={product.image_url} className="mt-2 w-32 h-32 object-cover rounded" />
+                            <Image
+                                src={product.image_url}
+                                alt={product.name || "Product Image"}
+                                width={128}
+                                height={128}
+                                className="mt-2 w-32 h-32 object-cover rounded"
+                            />
                         )}
                     </div>
 
