@@ -7,6 +7,7 @@ import { apiPost } from "@/lib/api";
 import { getToken } from "@/lib/auth";
 import { useRouter } from "next/navigation";
 import ImageUploader from "@/components/ImageUploader";
+import Image from "next/image";
 
 export default function AddProductPage() {
     const router = useRouter();
@@ -126,8 +127,15 @@ export default function AddProductPage() {
                         />
 
                         {product.image_url && (
-                            <img src={product.image_url} className="mt-2 w-32 h-32 object-cover rounded" />
+                            <Image
+                                src={product.image_url}
+                                alt={product.name || "Product Image"}
+                                width={128}
+                                height={128}
+                                className="mt-2 w-32 h-32 object-cover rounded"
+                            />
                         )}
+
                     </div>
 
                 </div>
