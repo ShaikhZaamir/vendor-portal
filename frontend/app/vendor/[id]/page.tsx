@@ -29,7 +29,6 @@ export default async function VendorProfilePage(props: {
   params: Promise<{ id: string }>;
 }) {
   const { id } = await props.params;
-
   const vendorResponse = await apiGet(`/api/public/vendor/${id}`);
 
   if (!vendorResponse || vendorResponse.error) {
@@ -43,97 +42,105 @@ export default async function VendorProfilePage(props: {
   const vendor = vendorResponse as Vendor;
 
   return (
-    <div className="max-w-4xl mx-auto p-6 space-y-8">
+    <div className="max-w-11/12 mx-auto p-6 space-y-10">
 
-      {/* VENDOR HEADER */}
-      <div className="flex items-start gap-6">
-        {/* LOGO */}
+      {/* HEADER */}
+      <div className="bg-white rounded-xl shadow-md p-6 flex flex-col sm:flex-row gap-6">
+
         {vendor.logo_url ? (
           <Image
             src={vendor.logo_url}
             alt="Vendor Logo"
-            width={120}
-            height={120}
-            className="rounded-lg border shadow-sm object-cover"
+            width={150}
+            height={150}
+            className="rounded-xl object-contain shadow-sm"
           />
         ) : (
-          <div className="w-[120px] h-[120px] rounded-lg bg-gray-200 flex items-center justify-center text-gray-500">
+          <div className="w-[120px] h-[120px] rounded-xl bg-gray-200 flex items-center justify-center text-gray-500">
             No Logo
           </div>
         )}
 
         <div>
-          <h1 className="text-3xl font-bold">{vendor.name}</h1>
-          <p className="text-gray-700 text-lg">{vendor.category}</p>
-          <p className="text-gray-600">{vendor.city}</p>
+          <h1 className="text-3xl font-bold text-gray-900">{vendor.name}</h1>
 
-          {/* Rating */}
-          <div className="flex items-center gap-1 mt-2">
-            <Star className="w-5 h-5 text-yellow-500" />
-            <span className="text-lg">{vendor.average_rating ?? 0}</span>
+          <div className="flex gap-3 mt-2">
+            <span className="px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-sm">
+              {vendor.category}
+            </span>
+            <span className="px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-sm">
+              {vendor.city}
+            </span>
           </div>
+
+          <div className="flex items-center gap-2 mt-3">
+            <Star className="w-5 h-5 text-yellow-500" />
+            <span className="text-lg font-semibold">
+              {vendor.average_rating ?? 0}
+            </span>
+          </div>
+          {vendor.description && (
+            <p className="text-gray-700 leading-relaxed text-lg bg-gray-50 p-4 rounded-xl">
+              {vendor.description}
+            </p>
+          )}
         </div>
       </div>
 
       {/* DESCRIPTION */}
-      {vendor.description && (
-        <p className="text-gray-700 leading-relaxed">{vendor.description}</p>
-      )}
 
       <Link
         href={`/feedback/${vendor.id}`}
-        className="inline-block mt-2 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition"
+        className="inline-block px-5 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition shadow"
       >
         Give Feedback
       </Link>
 
-      {/* PRODUCTS SECTION */}
+      {/* PRODUCTS */}
       <div>
-        <h2 className="text-2xl font-semibold mt-10 mb-4">Products</h2>
+        <h2 className="text-2xl font-bold mb-4">Products</h2>
 
-        {/* Empty State */}
-        {(!vendor.products || vendor.products.length === 0) && (
-          <p className="text-gray-600">No products added yet.</p>
+        {vendor.products.length === 0 && (
+          <div className="text-gray-600 bg-gray-50 rounded-xl p-6 text-center">
+            No products added yet.
+          </div>
         )}
 
-        {/* PRODUCTS GRID */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+        <div className="grid grid-cols-4 gap-6">
           {vendor.products.map((prod) => (
             <div
               key={prod.id}
-              className="border border-gray-200 rounded-lg p-4 bg-white shadow-sm"
+              className="bg-white rounded-xl shadow-sm hover:shadow-md transition p-4"
             >
-              {/* PRODUCT IMAGE */}
               {prod.image_url ? (
                 <Image
                   src={prod.image_url}
                   alt={prod.name}
-                  width={300}
-                  height={200}
-                  className="rounded-md object-cover mb-3"
+                  width={500}
+                  height={300}
+                  className="rounded-lg object-cover mb-3 h-40 w-full"
                 />
               ) : (
-                <div className="w-full rounded-md bg-gray-200 flex items-center justify-center text-gray-500 mb-3">
+                <div className="w-full h-40 bg-gray-200 rounded-lg flex items-center justify-center text-gray-500">
                   No Image
                 </div>
               )}
 
-              {/* NAME */}
-              <h3 className="text-lg font-semibold">{prod.name}</h3>
+              <h3 className="text-lg font-semibold text-gray-900">{prod.name}</h3>
 
-              {/* DESCRIPTION */}
               {prod.description && (
-                <p className="text-gray-700 mt-1">{prod.description}</p>
+                <p className="text-gray-600 mt-1 line-clamp-2">
+                  {prod.description}
+                </p>
               )}
 
-              {/* PRICE RANGE */}
-              {prod.min_price || prod.max_price ? (
-                <p className="mt-2 font-medium">
-                  ₹ {prod.min_price ?? prod.price} – {prod.max_price ?? prod.price}
-                </p>
-              ) : prod.price ? (
-                <p className="mt-2 font-medium">₹ {prod.price}</p>
-              ) : null}
+              <p className="mt-2 font-bold text-gray-800">
+                {prod.min_price || prod.max_price
+                  ? `₹${prod.min_price ?? prod.price} – ₹${prod.max_price ?? prod.price}`
+                  : prod.price
+                    ? `₹${prod.price}`
+                    : "No price provided"}
+              </p>
             </div>
           ))}
         </div>

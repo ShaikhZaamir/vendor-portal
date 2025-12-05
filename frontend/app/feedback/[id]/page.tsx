@@ -2,7 +2,12 @@ export const dynamic = "force-dynamic";
 
 import { apiPost } from "@/lib/api";
 import { redirect } from "next/navigation";
+
 import StarRating from "./StarRating";
+
+import FormField from "@/components/ui/FormField";
+import Input from "@/components/ui/Input";
+import Button from "@/components/ui/Button";
 
 export default async function FeedbackPage({
     params,
@@ -31,54 +36,48 @@ export default async function FeedbackPage({
 
     return (
         <div className="max-w-xl mx-auto p-6">
-            <h1 className="text-2xl font-bold mb-4">Leave Feedback</h1>
+            <h1 className="text-3xl font-semibold text-gray-900 mb-6">
+                Leave Feedback
+            </h1>
 
-            <form action={handleSubmit} className="space-y-5">
-                {/* CLIENT NAME */}
-                <div>
-                    <label className="block mb-1 font-medium">Client Name</label>
-                    <input
-                        type="text"
-                        name="client_name"
-                        className="w-full border p-2 rounded"
-                        required
-                    />
-                </div>
+            <div className="bg-white p-6 rounded-xl border border-gray-100 shadow-md">
+                <form action={handleSubmit} className="space-y-6">
 
-                {/* PROJECT NAME */}
-                <div>
-                    <label className="block mb-1 font-medium">Project Name (optional)</label>
-                    <input
-                        type="text"
-                        name="project"
-                        className="w-full border p-2 rounded"
-                    />
-                </div>
+                    {/* CLIENT NAME */}
+                    <FormField label="Client Name" required>
+                        <Input name="client_name" required />
+                    </FormField>
 
-                {/* STAR RATING (client component) */}
-                <div>
-                    <label className="block mb-1 font-medium">Rating</label>
-                    <StarRating />
-                </div>
+                    {/* PROJECT NAME */}
+                    <FormField label="Project Name (optional)">
+                        <Input name="project" />
+                    </FormField>
 
-                {/* COMMENTS */}
-                <div>
-                    <label className="block mb-1 font-medium">Comments</label>
-                    <textarea
-                        name="comments"
-                        className="w-full border p-2 rounded"
-                        rows={4}
-                    />
-                </div>
+                    {/* RATING */}
+                    <FormField label="Rating" required>
+                        <StarRating />
+                    </FormField>
 
-                {/* SUBMIT */}
-                <button
-                    type="submit"
-                    className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700 transition"
-                >
-                    Submit Feedback
-                </button>
-            </form>
+                    {/* COMMENTS */}
+                    <FormField label="Comments">
+                        <textarea
+                            name="comments"
+                            rows={4}
+                            className="
+                w-full bg-white border border-gray-300 rounded-md px-4 py-3
+                text-gray-800 outline-none focus:border-blue-600
+                focus:ring-2 focus:ring-blue-200
+              "
+                        />
+                    </FormField>
+
+                    {/* SUBMIT */}
+                    <div className="pt-3">
+                        <Button type="submit">Submit Feedback</Button>
+                    </div>
+
+                </form>
+            </div>
         </div>
     );
 }

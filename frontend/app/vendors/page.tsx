@@ -25,91 +25,99 @@ export default function VendorsPage() {
     const [category, setCategory] = useState("");
     const [sort, setSort] = useState("");
 
-    // Load vendors
     useEffect(() => {
         async function load() {
             const data = await apiGet("/api/public/vendors");
             const v = data.vendors || [];
             setVendors(v);
-            setFiltered(v); // initial list
+            setFiltered(v);
         }
         load();
     }, []);
 
-    // Apply filtering / sorting
     useEffect(() => {
-        async function applyFilters() {
-            let result = [...vendors];
+        let result = [...vendors];
 
-            // SEARCH by name
-            if (search.trim() !== "") {
-                result = result.filter((v) =>
-                    v.name.toLowerCase().includes(search.toLowerCase())
-                );
-            }
-
-            // FILTER by category
-            if (category !== "") {
-                result = result.filter((v) => v.category === category);
-            }
-
-            // SORT by rating
-            if (sort === "high") {
-                result = result.sort(
-                    (a, b) => (b.average_rating ?? 0) - (a.average_rating ?? 0)
-                );
-            } else if (sort === "low") {
-                result = result.sort(
-                    (a, b) => (a.average_rating ?? 0) - (b.average_rating ?? 0)
-                );
-            }
-
-            setFiltered(result); // ✔ safe inside async function
+        if (search.trim() !== "") {
+            result = result.filter((v) =>
+                v.name.toLowerCase().includes(search.toLowerCase())
+            );
         }
 
-        applyFilters();
-    }, [search, category, sort, vendors]);
+        if (category !== "") {
+            result = result.filter((v) => v.category === category);
+        }
 
+        if (sort === "high") {
+            result = result.sort(
+                (a, b) => (b.average_rating ?? 0) - (a.average_rating ?? 0)
+            );
+        } else if (sort === "low") {
+            result = result.sort(
+                (a, b) => (a.average_rating ?? 0) - (b.average_rating ?? 0)
+            );
+        }
+
+        setFiltered(result);
+    }, [search, category, sort, vendors]);
 
     return (
         <div className="max-w-6xl mx-auto p-6">
-            <h1 className="text-3xl font-bold mb-6">Vendors</h1>
+
+            {/* TITLE */}
+            <h1 className="text-3xl font-semibold mb-6 text-gray-900">Vendors</h1>
 
             {/* FILTER BAR */}
-            <div className="flex flex-col sm:flex-row gap-4 mb-6">
-                <input
-                    type="text"
-                    placeholder="Search by name..."
-                    className="border p-2 rounded w-full sm:w-1/3"
-                    value={search}
-                    onChange={(e) => setSearch(e.target.value)}
-                />
+            <div className="bg-white p-4 rounded-xl border border-gray-100 shadow-sm mb-8">
+                <div className="flex flex-col sm:flex-row gap-4">
 
-                <select
-                    className="border p-2 rounded w-full sm:w-1/3"
-                    value={category}
-                    onChange={(e) => setCategory(e.target.value)}
-                >
-                    <option value="">All Categories</option>
-                    <option>Contractor</option>
-                    <option>Material Supplier</option>
-                    <option>Consultant</option>
-                    <option>Fabricator</option>
-                    <option>Labour Contractor</option>
-                    <option>Interior Designer</option>
-                    <option>Architect</option>
-                    <option>Other</option>
-                </select>
+                    <input
+                        type="text"
+                        placeholder="Search by name..."
+                        className="
+              bg-white border border-gray-300 rounded-md px-4 py-2
+              w-full sm:w-1/3 outline-none
+              focus:border-blue-600 focus:ring-2 focus:ring-blue-200
+            "
+                        value={search}
+                        onChange={(e) => setSearch(e.target.value)}
+                    />
 
-                <select
-                    className="border p-2 rounded w-full sm:w-1/3"
-                    value={sort}
-                    onChange={(e) => setSort(e.target.value)}
-                >
-                    <option value="">Sort by Rating</option>
-                    <option value="high">High to Low</option>
-                    <option value="low">Low to High</option>
-                </select>
+                    <select
+                        className="
+              bg-white border border-gray-300 rounded-md px-4 py-2
+              w-full sm:w-1/3 outline-none
+              focus:border-blue-600 focus:ring-2 focus:ring-blue-200
+            "
+                        value={category}
+                        onChange={(e) => setCategory(e.target.value)}
+                    >
+                        <option value="">All Categories</option>
+                        <option>Contractor</option>
+                        <option>Material Supplier</option>
+                        <option>Consultant</option>
+                        <option>Fabricator</option>
+                        <option>Labour Contractor</option>
+                        <option>Interior Designer</option>
+                        <option>Architect</option>
+                        <option>Other</option>
+                    </select>
+
+                    <select
+                        className="
+              bg-white border border-gray-300 rounded-md px-4 py-2
+              w-full sm:w-1/3 outline-none
+              focus:border-blue-600 focus:ring-2 focus:ring-blue-200
+            "
+                        value={sort}
+                        onChange={(e) => setSort(e.target.value)}
+                    >
+                        <option value="">Sort by Rating</option>
+                        <option value="high">High to Low</option>
+                        <option value="low">Low to High</option>
+                    </select>
+
+                </div>
             </div>
 
             {/* VENDOR GRID */}
@@ -117,37 +125,50 @@ export default function VendorsPage() {
                 {filtered.map((vendor) => (
                     <div
                         key={vendor.id}
-                        className="border rounded-xl bg-white p-4 shadow-sm hover:shadow-md transition"
+                        className="
+              bg-white p-5 rounded-xl border border-gray-100 shadow-sm
+              hover:shadow-md transition cursor-pointer
+            "
                     >
+
                         {/* LOGO */}
                         {vendor.logo_url ? (
                             <Image
                                 src={vendor.logo_url}
                                 alt="Vendor Logo"
-                                width={80}
-                                height={80}
-                                className="rounded-md object-cover mb-3"
+                                width={100}
+                                height={100}
+                                className="rounded-lg object-cover mb-4"
                             />
                         ) : (
-                            <div className="w-20 h-20 bg-gray-200 rounded-md mb-3 flex items-center justify-center text-gray-500">
+                            <div className="w-24 h-24 bg-gray-200 rounded-lg mb-4 flex items-center justify-center text-gray-500">
                                 No Logo
                             </div>
                         )}
-                        <h2 className="text-lg font-semibold">{vendor.name}</h2>
-                        <p className="text-gray-700">{vendor.category}</p>
 
-                        {/* Rating */}
+                        {/* NAME & CATEGORY */}
+                        <h2 className="text-xl font-semibold text-gray-900">{vendor.name}</h2>
+                        <p className="text-gray-700 text-sm">{vendor.category}</p>
+
+                        {/* RATING */}
                         <div className="flex items-center gap-1 mt-2">
                             <Star className="w-4 h-4 text-yellow-500" />
-                            <span>{vendor.average_rating ?? 0}</span>
+                            <span className="text-gray-800">{vendor.average_rating ?? 0}</span>
                         </div>
 
+                        {/* VIEW PROFILE BUTTON */}
                         <Link
                             href={`/vendor/${vendor.id}`}
-                            className="inline-block mt-4 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition"
+                            className="
+                inline-block mt-5 w-full
+                bg-blue-600 text-white py-2 rounded-md 
+                hover:bg-blue-700 transition text-center
+                font-medium
+              "
                         >
                             View Profile
                         </Link>
+
                     </div>
                 ))}
             </div>

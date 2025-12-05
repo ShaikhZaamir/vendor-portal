@@ -6,26 +6,29 @@ import { useEffect, useState } from "react";
 import { apiGet, apiPut } from "@/lib/api";
 import { getToken } from "@/lib/auth";
 import { useRouter } from "next/navigation";
+
 import ImageUploader from "@/components/ImageUploader";
 import Image from "next/image";
+
+import FormField from "@/components/ui/FormField";
+import Input from "@/components/ui/Input";
+import Button from "@/components/ui/Button";
 
 type Product = {
     name: string;
     description: string | null;
     min_price?: number | null;
     max_price?: number | null;
-    price?: number | null; // fallback for older data
+    price?: number | null;
     image_url: string | null;
 };
 
 export default function EditProductPage(props: { params: Promise<{ id: string }> }) {
+    const router = useRouter();
+
     const [product, setProduct] = useState<Product | null>(null);
     const [loading, setLoading] = useState(true);
     const [showSuccess, setShowSuccess] = useState(false);
-
-    const router = useRouter();
-
-    // Correctly extract the ID
     const [productId, setProductId] = useState<string | null>(null);
 
     useEffect(() => {
@@ -58,7 +61,7 @@ export default function EditProductPage(props: { params: Promise<{ id: string }>
     if (loading) return <div className="p-6">Loading product...</div>;
     if (!product) return <div className="p-6">Product not found.</div>;
 
-    const _product = product; // ✔ Now guaranteed non-null
+    const _product = product; // guaranteed non-null
 
     async function handleSubmit(e: React.FormEvent) {
         e.preventDefault();
@@ -66,7 +69,7 @@ export default function EditProductPage(props: { params: Promise<{ id: string }>
         const token = getToken();
         if (!token || !productId) return;
 
-        // VALIDATE PRICE RANGE
+        // Price validation
         const min = _product.min_price ? Number(_product.min_price) : null;
         const max = _product.max_price ? Number(_product.max_price) : null;
 
@@ -75,7 +78,6 @@ export default function EditProductPage(props: { params: Promise<{ id: string }>
             return;
         }
 
-        // API CALL
         await apiPut(
             `/api/vendor/products/${productId}`,
             {
@@ -92,91 +94,94 @@ export default function EditProductPage(props: { params: Promise<{ id: string }>
     }
 
     return (
-        <div className="max-w-lg mx-auto p-6 relative">
-            <h1 className="text-2xl font-bold mb-4">Edit Product</h1>
+        <div className="mx-auto p-6 relative">
+            <h1 className="text-3xl font-semibold mb-6 text-gray-900">Edit Product</h1>
 
-            <form onSubmit={handleSubmit} className="space-y-4">
-                {/* PRODUCT NAME */}
-                <div>
-                    <label className="block mb-1 font-medium">Product Name</label>
-                    <input
-                        type="text"
-                        className="w-full border p-2 rounded"
-                        value={_product.name}
-                        onChange={(e) => setProduct({ ...product, name: e.target.value })}
-                        required
-                    />
-                </div>
+            <div className="bg-white p-6 rounded-xl border border-gray-100 shadow-md">
+                <form onSubmit={handleSubmit} className="space-y-6">
 
-                {/* DESCRIPTION */}
-                <div>
-                    <label className="block mb-1 font-medium">Short Description</label>
-                    <textarea
-                        className="w-full border p-2 rounded"
-                        rows={4}
-                        value={_product.description || ""}
-                        onChange={(e) => setProduct({ ...product, description: e.target.value })}
-                    ></textarea>
-                </div>
+                    {/* Two Column Layout */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
 
-                {/* PRICE RANGE */}
-                <div className="grid grid-cols-2 gap-4">
-                    <div>
-                        <label className="block mb-1 font-medium">Min Price</label>
-                        <input
-                            type="number"
-                            className="w-full border p-2 rounded"
-                            value={_product.min_price ?? ""}
-                            onChange={(e) =>
-                                setProduct({ ...product, min_price: Number(e.target.value) })
-                            }
-                        />
+                        {/* LEFT COLUMN */}
+                        <div className="space-y-4">
+                            <FormField label="Product Name" required>
+                                <Input
+                                    value={_product.name}
+                                    onChange={(e) => setProduct({ ...product, name: e.target.value })}
+                                />
+                            </FormField>
+
+                            <FormField label="Min Price">
+                                <Input
+                                    type="number"
+                                    value={_product.min_price ?? ""}
+                                    onChange={(e) =>
+                                        setProduct({ ...product, min_price: Number(e.target.value) })
+                                    }
+                                />
+                            </FormField>
+
+                            <FormField label="Max Price">
+                                <Input
+                                    type="number"
+                                    value={_product.max_price ?? ""}
+                                    onChange={(e) =>
+                                        setProduct({ ...product, max_price: Number(e.target.value) })
+                                    }
+                                />
+                            </FormField>
+                            
+                            <FormField label="Short Description">
+                                <textarea
+                                    rows={4}
+                                    value={_product.description ?? ""}
+                                    onChange={(e) =>
+                                        setProduct({ ...product, description: e.target.value })
+                                    }
+                                    className="
+                    w-full bg-white border border-gray-300 rounded-md px-4 py-3
+                    text-gray-800 outline-none focus:border-blue-600
+                    focus:ring-2 focus:ring-blue-200
+                  "
+                                />
+                            </FormField>
+                        </div>
+
+                        {/* RIGHT COLUMN */}
+                        <div className="space-y-4">
+
+
+                            <FormField label="Product Image">
+                                <ImageUploader
+                                    folder="product-images"
+                                    label="Upload Product Image"
+                                    onUpload={(url) => setProduct({ ...product, image_url: url })}
+                                />
+
+                                {product.image_url && (
+                                    <Image
+                                        src={product.image_url}
+                                        alt={product.name || "Product image"}
+                                        width={120}
+                                        height={120}
+                                        className="mt-3 w-32 h-32 object-cover rounded-lg border shadow-sm"
+                                    />
+                                )}
+                            </FormField>
+
+                        </div>
                     </div>
 
-                    <div>
-                        <label className="block mb-1 font-medium">Max Price</label>
-                        <input
-                            type="number"
-                            className="w-full border p-2 rounded"
-                            value={product.max_price ?? ""}
-                            onChange={(e) =>
-                                setProduct({ ...product, max_price: Number(e.target.value) })
-                            }
-                        />
-                    </div>
-                </div>
-
-                {/* IMAGE URL */}
-                <div>
-                    <label className="block mb-1 font-medium">Image URL (optional)</label>
-                    {/* PRODUCT IMAGE UPLOAD */}
-                    <div>
-                        <label className="block mb-1 font-medium">Product Image</label>
-
-                        <ImageUploader
-                            onUpload={(url) => setProduct({ ...product, image_url: url })}
-                        />
-
-                        {product.image_url && (
-                            <Image
-                                src={product.image_url}
-                                alt={product.name || "Product Image"}
-                                width={128}
-                                height={128}
-                                className="mt-2 w-32 h-32 object-cover rounded"
-                            />
-                        )}
+                    {/* Submit Button */}
+                    <div className="flex justify-center pt-2">
+                        <div className="w-48">
+                            <Button type="submit">Save Changes</Button>
+                        </div>
                     </div>
 
-                </div>
-
-                <button
-                    type="submit"
-                    className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700 transition"
-                >
-                    Save Changes
-                </button>
-            </form>
+                </form>
+            </div>
 
             {/* SUCCESS POPUP */}
             {showSuccess && (
@@ -187,12 +192,9 @@ export default function EditProductPage(props: { params: Promise<{ id: string }>
                             Your product details have been updated successfully.
                         </p>
 
-                        <button
-                            onClick={() => router.push("/dashboard/products")}
-                            className="w-full bg-blue-600 text-white py-2 rounded-md hover:bg-blue-700 transition"
-                        >
+                        <Button onClick={() => router.push("/dashboard/products")}>
                             Go Back to Products
-                        </button>
+                        </Button>
                     </div>
                 </div>
             )}

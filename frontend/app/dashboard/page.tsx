@@ -3,8 +3,8 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
+import Button from "@/components/ui/Button";
 
-// Proper vendor type
 type Vendor = {
     id: string;
     name: string;
@@ -36,73 +36,84 @@ export default function VendorDashboard() {
             );
 
             const data = await res.json();
-
-            // Support both shapes: {vendor: {...}} or direct vendor object
             setVendor(data.vendor ?? data ?? null);
             setLoading(false);
         }
 
         loadProfile();
-    }, [router]); // eslint fix
+    }, [router]);
 
     if (loading) return <p>Loading...</p>;
     if (!vendor) return <p>No vendor data found.</p>;
 
     return (
-        <div className="space-y-10">
+        <div className="space-y-6">
 
             {/* HEADER */}
             <div>
-                <h1 className="text-2xl font-semibold">Vendor Dashboard</h1>
+                <h1 className="text-3xl font-semibold text-gray-900">Dashboard</h1>
                 <p className="text-gray-600">Welcome, {vendor.name}</p>
             </div>
 
             {/* PROFILE SUMMARY */}
-            <div className="bg-white p-6 rounded-xl border shadow-sm">
-                <h2 className="text-xl font-semibold mb-4">Profile Summary</h2>
+            <div className="bg-white p-6 rounded-xl border border-gray-100 shadow-md">
+                {/* Top section: Logo + Name */}
+                <div className="flex items-start gap-8 mb-6">
+                    {vendor.logo_url ? (
+                        <Image
+                            src={vendor.logo_url}
+                            alt="Logo"
+                            width={90}
+                            height={90}
+                            className="rounded-lg border border-gray-200 shadow-sm"
+                        />
+                    ) : (
+                        <div className="w-20 h-20 rounded-lg bg-gray-200 flex items-center justify-center text-gray-500 text-sm">
+                            No Logo
+                        </div>
+                    )}
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    <p><strong>Name:</strong> {vendor.name}</p>
-                    <p><strong>Owner:</strong> {vendor.owner_name}</p>
-                    <p><strong>Email:</strong> {vendor.email}</p>
-                    <p><strong>Contact:</strong> {vendor.contact}</p>
-                    <p><strong>Category:</strong> {vendor.category}</p>
-                    <p><strong>City:</strong> {vendor.city}</p>
+                    <div className="space-y-1"  >
+                        <h2 className="text-2xl font-semibold text-gray-900">{vendor.name}</h2>
+                        <p className="text-gray-600 text-sm">{vendor.category}</p>
+                        <p className="text-gray-500 text-sm">{vendor.city}</p>
+                    </div>
                 </div>
 
+                {/* Details Grid */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-y-3">
+                    <p><strong className="text-gray-800">Owner:</strong> {vendor.owner_name}</p>
+                    <p><strong className="text-gray-800">Email:</strong> {vendor.email}</p>
+                    <p><strong className="text-gray-800">Contact:</strong> {vendor.contact}</p>
+                    <p><strong className="text-gray-800">Category:</strong> {vendor.category}</p>
+                    <p><strong className="text-gray-800">City:</strong> {vendor.city}</p>
+                </div>
+
+                {/* Description */}
                 {vendor.description && (
-                    <p className="mt-3"><strong>Description:</strong> {vendor.description}</p>
+                    <p className="mt-4 text-gray-700 leading-relaxed">
+                        {vendor.description}
+                    </p>
                 )}
 
-                {vendor.logo_url && (
-                    <Image
-                        src={vendor.logo_url}
-                        alt="Logo"
-                        width={100}
-                        height={100}
-                        className="mt-4 border rounded"
-                    />
-                )}
-
-                <button
-                    onClick={() => router.push("/dashboard/profile")}
-                    className="mt-6 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
-                >
-                    Edit Profile
-                </button>
+                {/* Edit Button */}
+                <div className="mt-6 w-44">
+                    <Button onClick={() => router.push("/dashboard/profile")}>
+                        Edit Profile
+                    </Button>
+                </div>
             </div>
 
             {/* PRODUCT MANAGEMENT */}
-            <div className="bg-white p-6 rounded-xl border shadow-sm">
-                <h2 className="text-xl font-semibold mb-4">Products</h2>
+            <div className="bg-white p-6 rounded-xl border border-gray-100 shadow-md">
+                <h2 className="text-xl font-semibold text-gray-900 mb-2">Products</h2>
                 <p className="text-gray-600 mb-4">Manage your products.</p>
 
-                <button
-                    onClick={() => router.push("/dashboard/products")}
-                    className="px-4 py-2 bg-gray-900 text-white rounded hover:bg-black"
-                >
-                    Go to Product Management
-                </button>
+                <div className="w-fit">
+                    <Button variant="secondary" onClick={() => router.push("/dashboard/products")}>
+                        Go to Product Management
+                    </Button>
+                </div>
             </div>
 
         </div>

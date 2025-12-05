@@ -37,11 +37,38 @@ export default function ImageUploader({
 
     return (
         <div className="space-y-2">
-            <label className="text-sm font-medium">{label}</label>
-            <input type="file" accept="image/*" onChange={handleFile} />
-            {loading && (
-                <p className="text-xs text-gray-500">Uploading...</p>
-            )}
+            <label className="text-sm font-medium text-gray-700">{label}</label>
+
+            {/* HIDDEN INPUT */}
+            <input
+                id={`uploader-${folder}`}
+                type="file"
+                accept="image/*"
+                className="hidden"
+                onChange={handleFile}
+            />
+
+            {/* CLICKABLE UPLOAD ZONE */}
+            <div
+                onClick={() => document.getElementById(`uploader-${folder}`)?.click()}
+                className="
+        w-full py-8 px-4 border border-gray-300 rounded-lg bg-white
+        flex flex-col items-center justify-center cursor-pointer
+        hover:border-blue-500 hover:bg-blue-50 transition
+      "
+            >
+                <span className="text-blue-600 font-medium text-sm">
+                    Click to upload
+                </span>
+                <span className="text-xs text-gray-500 mt-1">JPG, PNG — up to 2MB</span>
+
+                {loading && (
+                    <span className="text-xs text-gray-500 mt-2 animate-pulse">
+                        Uploading...
+                    </span>
+                )}
+            </div>
         </div>
     );
+
 }

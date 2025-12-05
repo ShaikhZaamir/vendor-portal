@@ -5,6 +5,7 @@ import { Star } from "lucide-react";
 
 export default function StarRating() {
     const [rating, setRating] = useState(0);
+    const [hovered, setHovered] = useState(0);
 
     return (
         <>
@@ -12,14 +13,19 @@ export default function StarRating() {
                 {[1, 2, 3, 4, 5].map((s) => (
                     <Star
                         key={s}
-                        className={`w-7 h-7 cursor-pointer ${rating >= s ? "text-yellow-500" : "text-gray-400"
-                            }`}
+                        className={`
+              w-6 h-6 cursor-pointer transition-all duration-150
+              ${hovered >= s || rating >= s ? "text-yellow-300 fill-yellow-300" : "text-gray-300"}
+              hover:scale-110
+            `}
+                        onMouseEnter={() => setHovered(s)}
+                        onMouseLeave={() => setHovered(0)}
                         onClick={() => setRating(s)}
                     />
                 ))}
             </div>
 
-            {/* Hidden input for form POST */}
+            {/* hidden field for server action submission */}
             <input type="hidden" name="rating" value={rating} required />
         </>
     );

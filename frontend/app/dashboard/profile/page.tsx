@@ -7,6 +7,12 @@ import { apiGet, apiPut } from "@/lib/api";
 import { getToken } from "@/lib/auth";
 import { useRouter } from "next/navigation";
 
+import FormField from "@/components/ui/FormField";
+import Input from "@/components/ui/Input";
+import Button from "@/components/ui/Button";
+import ImageUploader from "@/components/ImageUploader";
+import Image from "next/image";
+
 type Vendor = {
     name: string;
     owner_name: string;
@@ -19,11 +25,10 @@ type Vendor = {
 
 export default function EditProfilePage() {
     const router = useRouter();
-
     const [vendor, setVendor] = useState<Vendor | null>(null);
     const [loading, setLoading] = useState(true);
+    const [logo, setLogo] = useState<string>("");
 
-    // Load vendor profile
     useEffect(() => {
         setTimeout(() => {
             const finalToken = getToken();
@@ -38,6 +43,7 @@ export default function EditProfilePage() {
 
                 if (data && data.vendor) {
                     setVendor(data.vendor);
+                    setLogo(data.vendor.logo_url ?? "");
                 }
 
                 setLoading(false);
@@ -46,7 +52,6 @@ export default function EditProfilePage() {
             loadVendor();
         }, 10);
     }, []);
-
 
     if (loading) return <div className="p-6">Loading profile...</div>;
     if (!vendor) return <div className="p-6">Failed to load profile.</div>;
@@ -59,97 +64,124 @@ export default function EditProfilePage() {
         const token = getToken();
         if (!token) return;
 
-        await apiPut("/api/vendor/profile", vendor, token ?? undefined);
+        await apiPut(
+            "/api/vendor/profile",
+            { ...vendor, logo_url: logo },
+            token ?? undefined
+        );
 
         alert("Profile updated successfully!");
         router.push("/dashboard");
     }
 
     return (
-        <div className="max-w-xl mx-auto p-6">
-            <h1 className="text-2xl font-bold mb-4">Edit Profile</h1>
+        <div className="mx-auto p-6">
+            <h1 className="text-3xl font-semibold mb-6 text-gray-900">
+                Edit Profile
+            </h1>
 
-            <form onSubmit={handleSubmit} className="space-y-4">
-                <div>
-                    <label className="block mb-1 font-medium">Vendor Name</label>
-                    <input
-                        type="text"
-                        value={vendor.name}
-                        onChange={(e) => setVendor({ ...vendor, name: e.target.value })}
-                        className="w-full border p-2 rounded"
-                    />
-                </div>
+            <div className="bg-white p-6 rounded-xl border border-gray-100 shadow-md">
+                <form onSubmit={handleSubmit} className="space-y-6">
 
-                <div>
-                    <label className="block mb-1 font-medium">Owner Name</label>
-                    <input
-                        type="text"
-                        value={vendor.owner_name}
-                        onChange={(e) =>
-                            setVendor({ ...vendor, owner_name: e.target.value })
-                        }
-                        className="w-full border p-2 rounded"
-                    />
-                </div>
+                    {/* GRID: 2 COLUMNS */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
 
-                <div>
-                    <label className="block mb-1 font-medium">Contact</label>
-                    <input
-                        type="text"
-                        value={vendor.contact}
-                        onChange={(e) =>
-                            setVendor({ ...vendor, contact: e.target.value })
-                        }
-                        className="w-full border p-2 rounded"
-                    />
-                </div>
+                        {/* LEFT COLUMN */}
+                        <div className="space-y-4">
 
-                <div>
-                    <label className="block mb-1 font-medium">Category</label>
-                    <input
-                        type="text"
-                        value={vendor.category}
-                        onChange={(e) =>
-                            setVendor({ ...vendor, category: e.target.value })
-                        }
-                        className="w-full border p-2 rounded"
-                    />
-                </div>
+                            <FormField label="Vendor Name">
+                                <Input
+                                    value={vendor.name}
+                                    onChange={(e) =>
+                                        setVendor({ ...vendor, name: e.target.value })
+                                    }
+                                />
+                            </FormField>
 
-                <div>
-                    <label className="block mb-1 font-medium">City</label>
-                    <input
-                        type="text"
-                        value={vendor.city}
-                        onChange={(e) => setVendor({ ...vendor, city: e.target.value })}
-                        className="w-full border p-2 rounded"
-                    />
-                </div>
+                            <FormField label="Owner Name">
+                                <Input
+                                    value={vendor.owner_name}
+                                    onChange={(e) =>
+                                        setVendor({ ...vendor, owner_name: e.target.value })
+                                    }
+                                />
+                            </FormField>
 
-                <div>
-                    <label className="block mb-1 font-medium">Description</label>
-                    <textarea
-                        value={vendor.description}
-                        onChange={(e) =>
-                            setVendor({ ...vendor, description: e.target.value })
-                        }
-                        className="w-full border p-2 rounded"
-                        rows={4}
-                    />
-                </div>
+                            <FormField label="Contact">
+                                <Input
+                                    value={vendor.contact}
+                                    onChange={(e) =>
+                                        setVendor({ ...vendor, contact: e.target.value })
+                                    }
+                                />
+                            </FormField>
 
-                <div>
-                    <label className="block mb-1 font-medium">Logo URL (optional)</label>
-                    IMG
-                </div>
+                            <FormField label="Category">
+                                <Input
+                                    value={vendor.category}
+                                    onChange={(e) =>
+                                        setVendor({ ...vendor, category: e.target.value })
+                                    }
+                                />
+                            </FormField>
 
-                <button
-                    type="submit"
-                    className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700 transition"
-                >
-                    Save Changes
-                </button>
-            </form>
+                            <FormField label="City">
+                                <Input
+                                    value={vendor.city}
+                                    onChange={(e) =>
+                                        setVendor({ ...vendor, city: e.target.value })
+                                    }
+                                />
+                            </FormField>
+
+                        </div>
+
+                        {/* RIGHT COLUMN */}
+                        <div className="space-y-4">
+
+                            <FormField label="Description">
+                                <textarea
+                                    value={vendor.description}
+                                    onChange={(e) =>
+                                        setVendor({ ...vendor, description: e.target.value })
+                                    }
+                                    rows={4}
+                                    className="
+              w-full bg-white border border-gray-300 rounded-md px-4 py-3
+              text-gray-800 outline-none focus:border-blue-600
+              focus:ring-2 focus:ring-blue-200
+            "
+                                />
+                            </FormField>
+
+                            <FormField label="Company Logo (optional)">
+                                <ImageUploader
+                                    folder="vendor-logos"
+                                    label=""
+                                    onUpload={(url) => setLogo(url)}
+                                />
+
+                                {logo && (
+                                    <Image
+                                        src={logo}
+                                        alt="Logo Preview"
+                                        width={90}
+                                        height={90}
+                                        className="mt-3 rounded-lg border shadow-sm"
+                                    />
+                                )}
+                            </FormField>
+
+                        </div>
+                    </div>
+
+                    {/* BUTTON */}
+                    <div className="pt-4 w-40 mx-auto">
+                        <Button type="submit">Save Changes</Button>
+                    </div>
+
+                </form>
+            </div>
         </div>
     );
 }
