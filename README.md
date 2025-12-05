@@ -52,19 +52,42 @@ This project implements real-world vendor workflows including registration, auth
 vendor-portal/
 │
 ├── backend/
+│   ├── lib/
 │   ├── src/
-│   │   ├── routes/
 │   │   ├── middleware/
+│   │   ├── routes/
 │   │   ├── server.js
 │   ├── package.json
+│   ├── tsconfig.json
+│   ├── .env
 │
 └── frontend/
     ├── app/
-    │   ├── vendor/
+    │   ├── admin/
+    │   │   ├── vendors/
+    │   ├── api/
+    │   │   ├── upload/
     │   ├── dashboard/
-    │   ├── admin/vendors/
+    │   │   ├── products/
+    │   │   ├── profile/
+    │   ├── feedback/
+    │   │   ├── [id]/
+    │   ├── login/
+    │   ├── register/
+    │   ├── vendor/
+    │   │   ├── [id]/
+    │   ├── vendors/
+    ├── components/
+    │   ├── ui/
     ├── lib/
+    ├── public/
     ├── package.json
+    ├── tsconfig.json
+    ├── next.config.ts
+    ├── tailwind.config.js
+    ├── postcss.config.mjs
+    ├── .env.local
+
 ```
 
 ---
@@ -81,7 +104,7 @@ PORT=5000
 
 ### Frontend `.env.local`
 
-(Not required unless deploying with external API base URLs)
+NEXT_PUBLIC_API_URL=http://localhost:5000
 
 ---
 
@@ -156,5 +179,3 @@ This project was built with:
 - Fully typed frontend
 - Protected dashboard routes
 - Production-ready API structure
-
-Perfect for interview submissions & portfolio projects.
