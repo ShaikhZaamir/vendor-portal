@@ -138,48 +138,54 @@ export default function VendorsPage() {
                     <div
                         key={vendor.id}
                         className="
-              bg-white p-5 rounded-xl border border-gray-100 shadow-sm
-              hover:shadow-md transition cursor-pointer
-            "
+        bg-white p-5 rounded-xl border border-gray-100 shadow-sm 
+        hover:shadow-md transition cursor-pointer 
+        flex flex-col h-full
+    "
                     >
 
-                        {/* LOGO */}
-                        {vendor.logo_url ? (
-                            <Image
-                                src={vendor.logo_url}
-                                alt="Vendor Logo"
-                                width={100}
-                                height={100}
-                                className="rounded-lg object-cover mb-4"
-                            />
-                        ) : (
-                            <div className="w-24 h-24 bg-gray-200 rounded-lg mb-4 flex items-center justify-center text-gray-500">
-                                No Logo
-                            </div>
-                        )}
-
-                        {/* NAME & CATEGORY */}
-                        <h2 className="text-xl font-semibold text-gray-900">{vendor.name}</h2>
-                        <p className="text-gray-700 text-sm">{vendor.category}</p>
-
-                        {/* RATING */}
-                        <div className="flex items-center gap-1 mt-2">
-                            <Star className="w-4 h-4 text-yellow-500" />
-                            <span className="text-gray-800">{vendor.average_rating ?? 0}</span>
+                        {/* FIXED SIZE LOGO */}
+                        <div className="w-full flex justify-center mb-4">
+                            {vendor.logo_url ? (
+                                <Image
+                                    src={vendor.logo_url}
+                                    alt="Vendor Logo"
+                                    width={100}
+                                    height={100}
+                                    className="rounded-lg object-cover w-24 h-24"
+                                />
+                            ) : (
+                                <div className="w-24 h-24 bg-gray-200 rounded-lg flex items-center justify-center text-gray-500">
+                                    No Logo
+                                </div>
+                            )}
                         </div>
 
-                        {/* VIEW PROFILE BUTTON */}
-                        <Link
-                            href={`/vendor/${vendor.id}`}
-                            className="
-                inline-block mt-5 w-full
-                bg-blue-600 text-white py-2 rounded-md 
-                hover:bg-blue-700 transition text-center
-                font-medium
-              "
-                        >
-                            View Profile
-                        </Link>
+                        {/* CONTENT */}
+                        <div className="flex flex-col flex-grow">
+                            <h2 className="text-xl font-semibold text-gray-900">{vendor.name}</h2>
+                            <p className="text-gray-700 text-sm">{vendor.category}</p>
+
+                            {/* Rating */}
+                            <div className="flex items-center gap-1 mt-2">
+                                <Star className="w-4 h-4 text-yellow-500" />
+                                <span className="text-gray-800">{vendor.average_rating ?? 0}</span>
+                            </div>
+
+                            {/* PUSH BUTTON TO BOTTOM */}
+                            <div className="mt-auto">
+                                <Link
+                                    href={`/vendor/${vendor.id}`}
+                                    className="
+                    inline-block mt-5 w-full
+                    bg-blue-600 text-white py-2 rounded-md 
+                    hover:bg-blue-700 transition text-center font-medium
+                "
+                                >
+                                    View Profile
+                                </Link>
+                            </div>
+                        </div>
 
                     </div>
                 ))}
