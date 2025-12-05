@@ -162,7 +162,7 @@ export default function VendorsPage() {
                         </div>
 
                         {/* CONTENT */}
-                        <div className="flex flex-col flex-grow">
+                        <div className="flex flex-col grow">
                             <h2 className="text-xl font-semibold text-gray-900">{vendor.name}</h2>
                             <p className="text-gray-700 text-sm">{vendor.category}</p>
 
