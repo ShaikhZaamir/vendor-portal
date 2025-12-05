@@ -3,7 +3,7 @@ import { pool } from "../db.js";
 
 const router = express.Router();
 
-// GET FULL PUBLIC VENDOR PROFILE
+// PUBLIC VENDOR PROFILE
 router.get("/vendor/:id", async (req, res) => {
   try {
     const vendorId = req.params.id;
@@ -78,11 +78,7 @@ router.get("/vendors", async (req, res) => {
 });
 
 
-/**
- * ADD REVIEW (Public)
- * POST /api/public/vendor/:id/reviews
- * Body: { client_name, project?, rating, comment? }
- */
+// ADD REVIEW (Public)
 router.post("/vendor/:id/reviews", async (req, res) => {
   const vendorId = req.params.id;
   const { client_name, project, rating, comment } = req.body;
@@ -157,10 +153,7 @@ router.post("/vendor/:id/reviews", async (req, res) => {
   }
 });
 
-/**
- * GET ALL REVIEWS FOR A VENDOR (Public)
- * GET /api/public/vendor/:id/reviews
- */
+// GET ALL REVIEWS FOR A VENDOR (Public)
 router.get("/vendor/:id/reviews", async (req, res) => {
   try {
     const vendorId = req.params.id;

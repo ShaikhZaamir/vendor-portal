@@ -3,14 +3,10 @@ import { pool } from "../db.js";
 
 const router = express.Router();
 
-/**
- * ADD PRODUCT
- * POST /api/vendor/products
- * Protected route (verifyToken is applied in server.js)
- */
+// ADD PRODUCT 
 router.post("/products", async (req, res) => {
   try {
-    const vendorId = req.user.id; // Comes from verifyToken middleware
+    const vendorId = req.user.id; 
     const { name, description, price, image_url } = req.body;
 
     if (!name) {
@@ -34,10 +30,7 @@ router.post("/products", async (req, res) => {
   }
 });
 
-/**
- * GET ALL PRODUCTS OF LOGGED-IN VENDOR
- * GET /api/vendor/products
- */
+// GET ALL PRODUCTS OF LOGGED-IN VENDOR
 router.get("/products", async (req, res) => {
   try {
     const vendorId = req.user.id;
@@ -56,10 +49,7 @@ router.get("/products", async (req, res) => {
   }
 });
 
-/**
- * UPDATE PRODUCT
- * PUT /api/vendor/products/:id
- */
+// UPDATE PRODUCT 
 router.put("/products/:id", async (req, res) => {
   try {
     const vendorId = req.user.id;
@@ -106,10 +96,7 @@ router.put("/products/:id", async (req, res) => {
   }
 });
 
-/**
- * DELETE PRODUCT
- * DELETE /api/vendor/products/:id
- */
+// DELETE PRODUCT
 router.delete("/products/:id", async (req, res) => {
   try {
     const vendorId = req.user.id;
@@ -197,7 +184,7 @@ router.put("/profile", async (req, res) => {
   }
 });
 
-// GET /api/vendor/products/:id  (Get single product for editing)
+// GET /api/vendor/products/:id  
 router.get("/products/:id", async (req, res) => {
   try {
     const vendorId = req.user.id;

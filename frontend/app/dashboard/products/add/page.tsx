@@ -142,7 +142,6 @@ export default function AddProductPage() {
                             </div>
                         </div>
 
-                        {/* SUBMIT BUTTON */}
                         <div className="flex justify-center pt-2">
                             <div className="w-48">
                                 <Button

@@ -144,7 +144,6 @@ export default function VendorsPage() {
     "
                     >
 
-                        {/* FIXED SIZE LOGO */}
                         <div className="w-full flex justify-center mb-4">
                             {vendor.logo_url ? (
                                 <Image
@@ -157,10 +156,10 @@ export default function VendorsPage() {
                             ) : (
                                 <div className="w-24 h-24 bg-gray-200 rounded-lg flex items-center justify-center text-gray-500">
                                     No Logo
-                                </div>
+                                </div> 
                             )}
                         </div>
-
+ 
                         {/* CONTENT */}
                         <div className="flex flex-col grow">
                             <h2 className="text-xl font-semibold text-gray-900">{vendor.name}</h2>
@@ -172,7 +171,6 @@ export default function VendorsPage() {
                                 <span className="text-gray-800">{vendor.average_rating ?? 0}</span>
                             </div>
 
-                            {/* PUSH BUTTON TO BOTTOM */}
                             <div className="mt-auto">
                                 <Link
                                     href={`/vendor/${vendor.id}`}

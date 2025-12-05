@@ -12,7 +12,7 @@ import Input from "@/components/ui/Input";
 import Button from "@/components/ui/Button";
 import ImageUploader from "@/components/ImageUploader";
 import Image from "next/image";
-import { toast } from "sonner"; // ⭐ NEW
+import { toast } from "sonner";
 
 type Vendor = {
     name: string;
@@ -71,7 +71,6 @@ export default function EditProfilePage() {
             token ?? undefined
         );
 
-        // ⭐ Replace ALERT with TOAST
         toast.success("Profile updated successfully!", {
             description: "Your account details have been saved.",
         });
@@ -88,7 +87,7 @@ export default function EditProfilePage() {
             <div className="bg-white p-6 rounded-xl border border-gray-100 shadow-md">
                 <form onSubmit={handleSubmit} className="space-y-6">
 
-                    {/* GRID: 2 COLUMNS */}
+                    {/* GRID */}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
 
                         {/* LEFT COLUMN */}
@@ -179,7 +178,6 @@ export default function EditProfilePage() {
                         </div>
                     </div>
 
-                    {/* BUTTON */}
                     <div className="pt-4 w-40 mx-auto">
                         <Button type="submit">Save Changes</Button>
                     </div>

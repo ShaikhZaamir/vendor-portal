@@ -66,7 +66,6 @@ export default function ProductListPage() {
         // Remove from local UI
         setProducts((prev) => prev.filter((p) => p.id !== deleteId));
 
-        // Close dialog
         setConfirmOpen(false);
     }
 

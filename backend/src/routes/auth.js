@@ -29,7 +29,7 @@ router.post("/register", async (req, res) => {
       logo_url,
     } = req.body;
 
-    // Upload logo to Cloudinary
+    // Cloudinary
     if (req.file) {
       const uploadResult = await new Promise((resolve, reject) => {
         cloudinary.uploader

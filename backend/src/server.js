@@ -9,7 +9,7 @@ import adminRoutes from "./routes/admin.js";
 
 dotenv.config();
 
-// Initialize app FIRST (very important)
+// Initialize 
 const app = express();
 
 // Middlewares

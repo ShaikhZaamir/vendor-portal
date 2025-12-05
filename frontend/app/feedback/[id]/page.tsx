@@ -71,7 +71,6 @@ export default async function FeedbackPage({
                         />
                     </FormField>
 
-                    {/* SUBMIT */}
                     <div className="pt-3">
                         <Button type="submit">Submit Feedback</Button>
                     </div>

@@ -64,7 +64,6 @@ export default function VendorDashboardLayout({
                     </nav>
                 </div>
 
-                {/* Logout button with dialog */}
                 <Button
                     variant="danger"
                     onClick={() => setConfirmOpen(true)}

@@ -39,16 +39,14 @@ export default function ImageUploader({
         <div className="space-y-2">
             <label className="text-sm font-medium text-gray-700">{label}</label>
 
-            {/* HIDDEN INPUT */}
             <input
                 id={`uploader-${folder}`}
                 type="file"
                 accept="image/*"
                 className="hidden"
                 onChange={handleFile}
-            />
+            /> 
 
-            {/* CLICKABLE UPLOAD ZONE */}
             <div
                 onClick={() => document.getElementById(`uploader-${folder}`)?.click()}
                 className="

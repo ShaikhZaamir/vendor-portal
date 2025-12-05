@@ -3,10 +3,7 @@ import { pool } from "../db.js";
 
 const router = express.Router();
 
-/**
- * ADMIN — Get Vendor List with Ratings + Review Count
- * GET /api/admin/vendors
- */
+// Get Vendor List with Ratings + Review Count
 router.get("/vendors", async (req, res) => {
   try {
     const result = await pool.query(

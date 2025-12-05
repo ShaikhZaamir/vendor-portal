@@ -108,7 +108,7 @@ export default async function VendorProfilePage(props: {
             </div>
           )}
 
-          {/* Responsive Grid */}
+          {/* Grid */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {vendor.products.map((prod) => (
               <div
@@ -135,7 +135,6 @@ export default async function VendorProfilePage(props: {
                   <p className="text-gray-600 mt-1 line-clamp-2">{prod.description}</p>
                 )}
 
-                {/* Single Price */}
                 <p className="mt-2 font-bold text-gray-800">
                   {prod.price ? `₹${prod.price}` : "No price provided"}
                 </p>

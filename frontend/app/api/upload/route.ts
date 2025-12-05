@@ -1,8 +1,5 @@
-// /app/api/upload/route.ts
 import cloudinary from "@/lib/cloudinary";
 import { NextResponse } from "next/server";
-// Otherwise use a relative import (uncomment and adjust):
-// import cloudinary from "../../../lib/cloudinary";
 import { v4 as uuid } from "uuid";
 
 export const runtime = "nodejs";
@@ -25,7 +22,6 @@ export async function POST(req: Request) {
       );
     }
 
-    // Convert File -> Buffer (Node runtime)
     const arrayBuffer = await file.arrayBuffer();
     const buffer = Buffer.from(arrayBuffer);
 
@@ -38,7 +34,6 @@ export async function POST(req: Request) {
               public_id: uuid(),
               resource_type: "image",
             },
-            // typed callback: error could be any, result will be Cloudinary response
             (error: unknown, result: unknown) => {
               if (error) return reject(error);
               // Do runtime checks and cast safely

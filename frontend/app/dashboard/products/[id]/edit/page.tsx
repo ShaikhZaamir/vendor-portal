@@ -176,7 +176,6 @@ export default function EditProductPage(props: { params: Promise<{ id: string }>
                         </div>
                     </div>
 
-                    {/* SUBMIT BUTTON */}
                     <div className="flex justify-center pt-2">
                         <div className="w-48">
                             <Button

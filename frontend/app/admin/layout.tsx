@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LayoutList } from "lucide-react"; // icon for Vendors
+import { LayoutList } from "lucide-react";
 
 function cn(...classes: string[]) {
     return classes.filter(Boolean).join(" ");
