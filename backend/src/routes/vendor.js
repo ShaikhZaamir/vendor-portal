@@ -3,14 +3,25 @@ import { pool } from "../db.js";
 
 const router = express.Router();
 
-// ADD PRODUCT 
+// ADD PRODUCT
 router.post("/products", async (req, res) => {
   try {
-    const vendorId = req.user.id; 
+    const vendorId = req.user.id;
     const { name, description, price, image_url } = req.body;
 
     if (!name) {
       return res.status(400).json({ error: "Product name is required." });
+    }
+
+    // Check for duplicate product name 
+    const duplicateCheck = await pool.query(
+      `SELECT id FROM products 
+   WHERE vendor_id = $1 AND LOWER(name) = LOWER($2)`,
+      [vendorId, name]
+    );
+
+    if (duplicateCheck.rows.length > 0) {
+      return res.status(400).json({ error: "Product already exists." });
     }
 
     const result = await pool.query(
@@ -49,7 +60,7 @@ router.get("/products", async (req, res) => {
   }
 });
 
-// UPDATE PRODUCT 
+// UPDATE PRODUCT
 router.put("/products/:id", async (req, res) => {
   try {
     const vendorId = req.user.id;
@@ -184,7 +195,7 @@ router.put("/profile", async (req, res) => {
   }
 });
 
-// GET /api/vendor/products/:id  
+// GET /api/vendor/products/:id
 router.get("/products/:id", async (req, res) => {
   try {
     const vendorId = req.user.id;

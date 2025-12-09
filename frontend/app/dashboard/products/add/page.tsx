@@ -15,6 +15,17 @@ import Button from "@/components/ui/Button";
 import { toast } from "sonner";
 import BackButton from "@/components/ui/BackButton";
 
+// Safe API error type (no any)
+type ApiError = {
+    response?: {
+        data?: {
+            error?: string;
+        };
+    };
+    error?: string;
+    message?: string;
+};
+
 export default function AddProductPage() {
     const router = useRouter();
 
@@ -25,8 +36,15 @@ export default function AddProductPage() {
         image_url: "",
     });
 
+    const [nameError, setNameError] = useState("");
+
     function update(field: string, value: string) {
         setProduct((prev) => ({ ...prev, [field]: value }));
+
+        // Clear inline duplicate error when user edits name
+        if (field === "name") {
+            setNameError("");
+        }
     }
 
     const isFormValid =
@@ -54,22 +72,39 @@ export default function AddProductPage() {
             return;
         }
 
-        await apiPost(
-            "/api/vendor/products",
-            {
-                name: product.name,
-                description: product.description,
-                price: Number(product.price),
-                image_url: product.image_url,
-            },
-            token
-        );
+        try {
+            await apiPost(
+                "/api/vendor/products",
+                {
+                    name: product.name,
+                    description: product.description,
+                    price: Number(product.price),
+                    image_url: product.image_url,
+                },
+                token
+            );
 
-        toast.success("Product added successfully!", {
-            description: "Your product has been added to your product list.",
-        });
+            toast.success("Product added successfully!", {
+                description: "Your product has been added to your product list.",
+            });
 
-        router.push("/dashboard/products");
+            router.push("/dashboard/products");
+        } catch (error: unknown) {
+            const err = error as ApiError;
+
+            const msg =
+                err?.response?.data?.error ||
+                err?.error ||
+                err?.message ||
+                "Failed to add product. Please try again.";
+
+            if (msg === "Product already exists.") {
+                setNameError("This product already exists.");
+                return; // stop submission & redirect
+            }
+
+            toast.error(msg);
+        }
     }
 
     return (
@@ -95,6 +130,12 @@ export default function AddProductPage() {
                                         onChange={(e) => update("name", e.target.value)}
                                         required
                                     />
+
+                                    {nameError && (
+                                        <p className="text-red-600 text-sm mt-1">
+                                            {nameError}
+                                        </p>
+                                    )}
                                 </FormField>
 
                                 <FormField label="Price (₹)" required>

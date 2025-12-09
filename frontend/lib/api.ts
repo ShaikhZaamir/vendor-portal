@@ -1,6 +1,20 @@
 export const BASE_URL = process.env.NEXT_PUBLIC_API_URL!;
 
-// Helper for GET requests
+async function handleResponse(res: Response) {
+  const data = await res.json().catch(() => ({}));
+
+  if (!res.ok) {
+    throw {
+      response: {
+        data: data,
+      },
+      message: data?.error || "Request failed",
+    };
+  }
+
+  return data;
+}
+
 export async function apiGet(path: string, token?: string) {
   const res = await fetch(`${BASE_URL}${path}`, {
     method: "GET",
@@ -10,10 +24,9 @@ export async function apiGet(path: string, token?: string) {
     },
   });
 
-  return res.json();
+  return handleResponse(res);
 }
 
-// Helper for POST requests
 export async function apiPost(
   path: string,
   body: Record<string, unknown>,
@@ -28,10 +41,9 @@ export async function apiPost(
     body: JSON.stringify(body),
   });
 
-  return res.json();
+  return handleResponse(res);
 }
 
-// Helper for PUT requests
 export async function apiPut(
   path: string,
   body: Record<string, unknown>,
@@ -46,10 +58,9 @@ export async function apiPut(
     body: JSON.stringify(body),
   });
 
-  return res.json();
+  return handleResponse(res);
 }
 
-// Helper for DELETE requests
 export async function apiDelete(path: string, token?: string) {
   const res = await fetch(`${BASE_URL}${path}`, {
     method: "DELETE",
@@ -59,5 +70,5 @@ export async function apiDelete(path: string, token?: string) {
     },
   });
 
-  return res.json();
+  return handleResponse(res);
 }
